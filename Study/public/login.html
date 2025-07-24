@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+</head>
+<body>
+  <h2>로그인</h2>
+  <form id="loginForm">
+    <input type="text" name="email" placeholder="이메일 입력" required /><br>
+    <input type="password" name="password" placeholder="비밀번호 입력" required /><br>
+    <button type="submit">로그인</button>
+  </form>
+  <div id="result"></div>
+
+  <!-- script 아래에 두세요! -->
+  <script>
+    document.getElementById('loginForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        email: form.email.value,
+        password: form.password.value
+      };
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: new URLSearchParams(data)
+        });
+
+        // 서버 응답 코드를 먼저 확인
+        let result;
+        try {
+          result = await res.json();
+        } catch {
+          // 실패 시에도 콘솔 출력은 실행
+          const errText = await res.text();
+          console.log('서버 응답:', errText);
+          return;
+        }
+
+        // 정상 응답(로그인 성공)의 경우
+        console.log('이메일:', result.email);
+        console.log('비밀번호:', result.password);
+
+        // (선택) 성공 메시지 화면에 표시
+        document.getElementById('result').textContent = result.message;
+      } catch (err) {
+        // 화면에 아무 메시지도 띄우지 않음
+      }
+    };
+  </script>
+</body>
+</html>
